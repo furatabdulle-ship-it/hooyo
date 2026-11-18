@@ -1,0 +1,37 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hawo-cms",
+	"main": "src/worker.js",
+	"compatibility_date": "2026-11-18",
+	"workers_dev": false,
+	"routes": [
+		{
+			"pattern": "www.hawo-abdulle.com/api/*",
+			"zone_name": "hawo-abdulle.com"
+		}
+	],
+	"assets": {
+		"directory": "./",
+		"binding": "ASSETS",
+		"run_worker_first": [
+			"/api/*"
+		]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "hawo-cms",
+			"database_id": "6532c0fb-1689-4d50-9d9a-4cea20bb45b0",
+			"migrations_dir": "migrations"
+		},
+		{
+			"binding": "hawo_cms",
+			"database_name": "hawo-cms",
+			"database_id": "6532c0fb-1689-4d50-9d9a-4cea20bb45b0",
+			"remote": true
+		}
+	],
+	"vars": {
+		"INQUIRIES_ENABLED": "false"
+	}
+}

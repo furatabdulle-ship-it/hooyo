@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Interner Verwaltungsbereich für Anfragen und veröffentlichte Inhalte.">
+  <title>CMS · Hawo Abdulle</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="cms.css">
+</head>
+<body>
+  <a class="skip" href="#cms-main">Zum Inhalt</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="wordmark" href="../index.html">Hawo Abdulle<span></span></a>
+      <nav aria-label="CMS-Navigation">
+        <a href="../index.html">Website ansehen ↗</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap cms-main" id="cms-main">
+    <p class="eyebrow">Interner Bereich</p>
+    <h1 class="cms-title">CMS<span>.</span></h1>
+    <p class="cms-intro">Anfragen bearbeiten und Artikel oder Videos für die Website veröffentlichen.</p>
+
+    <p class="cms-status" data-status role="status" aria-live="polite">Lade Inhalte …</p>
+    <nav class="cms-tabs" aria-label="Verwaltungsbereiche">
+      <button type="button" class="cms-tab is-active" data-tab="inquiries">Anfragen</button>
+      <button type="button" class="cms-tab" data-tab="content">Artikel &amp; Videos</button>
+    </nav>
+
+    <section class="cms-panel" data-panel="inquiries" aria-labelledby="inquiries-title">
+      <div class="cms-section-heading">
+        <div>
+          <p class="eyebrow">Postfach</p>
+          <h2 id="inquiries-title">Anfragen</h2>
+        </div>
+        <button class="cms-button cms-button-secondary" type="button" data-refresh-inquiries>Aktualisieren</button>
+      </div>
+      <p class="cms-note">Anfragen enthalten persönliche Daten. Bearbeite sie vertraulich und lösche sie, sobald sie nicht mehr benötigt werden.</p>
+      <div class="cms-list" data-inquiries></div>
+    </section>
+
+    <section class="cms-panel" data-panel="content" aria-labelledby="content-title" hidden>
+      <div class="cms-section-heading">
+        <div>
+          <p class="eyebrow">Veröffentlichen</p>
+          <h2 id="content-title">Artikel &amp; Videos</h2>
+        </div>
+        <button class="cms-button cms-button-secondary" type="button" data-refresh-content>Aktualisieren</button>
+      </div>
+      <p class="cms-note">Artikel werden als Text veröffentlicht. Videos werden über einen sicheren HTTPS-Link geteilt; ein Datei-Upload ist nicht enthalten.</p>
+      <form class="cms-form" data-content-form>
+        <input type="hidden" name="id">
+        <label for="post-language">Sprache</label>
+        <select id="post-language" name="language" required>
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+        </select>
+        <label for="post-kind">Inhaltstyp</label>
+        <select id="post-kind" name="kind" required>
+          <option value="article">Artikel</option>
+          <option value="video">Video-Link</option>
+        </select>
+        <label for="post-title">Titel</label>
+        <input id="post-title" name="title" maxlength="180" required>
+        <label for="post-summary">Kurzbeschreibung</label>
+        <textarea id="post-summary" name="summary" rows="3" maxlength="500" required></textarea>
+        <label for="post-body">Text</label>
+        <textarea id="post-body" name="body" rows="7" maxlength="20000"></textarea>
+        <label for="post-url">Video-Link (HTTPS)</label>
+        <input id="post-url" name="url" type="url" maxlength="2048" placeholder="https://…">
+        <label for="post-status">Status</label>
+        <select id="post-status" name="status" required>
+          <option value="draft">Entwurf</option>
+          <option value="published">Veröffentlichen</option>
+        </select>
+        <div class="cms-form-actions">
+          <button class="cms-button" type="submit">Speichern</button>
+          <button class="cms-button cms-button-secondary" type="button" data-clear-form>Neuer Inhalt</button>
+        </div>
+      </form>
+      <h3 class="cms-list-title">Gespeicherte Inhalte</h3>
+      <div class="cms-list" data-content-list></div>
+    </section>
+  </main>
+  <script src="cms.js" defer></script>
+</body>
+</html>

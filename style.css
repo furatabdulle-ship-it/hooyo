@@ -151,3 +151,32 @@ dd + dt { margin-top: .6rem; }
 .hero-actions .button { margin-top: 0; }
 .hero-actions .button-secondary { color: var(--ink); background: transparent; border-color: var(--violet); }
 .hero-actions .button-secondary:hover { color: var(--paper); background: var(--violet); }
+
+.shared-content { padding-block: clamp(54px, 8vw, 102px); }
+.shared-content h2 { margin-bottom: 1.5rem; }
+.content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; }
+.content-card { padding: 1.35rem; border: 1px solid var(--rule); background: #fffaf4; }
+.content-card .eyebrow { margin-bottom: .65rem; }
+.content-card h3 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+.content-card p + p { margin-top: .75rem; }
+.content-card p:not(.eyebrow) { white-space: pre-line; }
+.content-card .text-link { margin-top: 1rem; }
+.content-empty { color: var(--body); }
+.inquiry-form { display: grid; gap: .65rem; max-width: 34rem; margin-top: 2rem; }
+.inquiry-form h2 { font-size: clamp(2rem, 4vw, 3rem); margin: 0 0 .25rem; }
+.inquiry-form > p { color: var(--body); font-size: .88rem; }
+.inquiry-form > label:not(.inquiry-consent) { margin-top: .4rem; font-size: .86rem; font-weight: 650; }
+.inquiry-form input:not([type="checkbox"]), .inquiry-form select, .inquiry-form textarea {
+  width: 100%; padding: .7rem .75rem; border: 1px solid var(--rule); border-radius: 0;
+  background: #fffaf4; color: var(--ink); font: inherit;
+}
+.inquiry-form textarea { resize: vertical; }
+.inquiry-form input:focus-visible, .inquiry-form select:focus-visible, .inquiry-form textarea:focus-visible {
+  outline: 2px solid var(--violet); outline-offset: 2px;
+}
+.inquiry-consent { display: flex; align-items: flex-start; gap: .55rem; margin-top: .6rem; font-size: .84rem; }
+.inquiry-consent input { margin-top: .35rem; }
+.inquiry-honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.inquiry-form .button { justify-self: start; margin-top: .5rem; }
+.inquiry-form .button:disabled { opacity: .55; cursor: not-allowed; }
+.form-status { min-height: 1.5em; }
