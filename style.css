@@ -57,7 +57,9 @@ h2 { font-size: clamp(2.55rem, 5.25vw, 5.15rem); line-height: .97; letter-spacin
 .work-grid article + article { border-left: 1px solid var(--rule); }
 .work-image { position: relative; aspect-ratio: 16 / 10; margin-block: 1rem; overflow: hidden; background: #e9d9ed; }
 .work-image--portrait { aspect-ratio: 3 / 4; }
+.work-image--poster { aspect-ratio: 4 / 5; background: var(--dark); }
 .work-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.work-image--poster img { object-fit: contain; }
 .work-image figcaption { left: .55rem; bottom: .55rem; padding: .35rem .5rem; font-size: .64rem; }
 h3 { font-size: clamp(1.9rem, 3.2vw, 3rem); line-height: 1.1; letter-spacing: -.055em; margin: .25em 0 .3em; }
 .work-grid p { font-size: .92rem; color: var(--body); }
