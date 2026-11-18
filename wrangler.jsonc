@@ -10,6 +10,9 @@
 			"zone_name": "hawo-abdulle.com"
 		}
 	],
+	"triggers": {
+		"crons": ["17 3 * * *"]
+	},
 	"assets": {
 		"directory": "./",
 		"binding": "ASSETS",
@@ -31,7 +34,14 @@
 			"remote": true
 		}
 	],
+	"send_email": [
+		{
+			"name": "INQUIRY_EMAIL",
+			"allowed_sender_addresses": ["anfragen@hawo-abdulle.com"]
+		}
+	],
 	"vars": {
-		"INQUIRIES_ENABLED": "false"
+		"INQUIRIES_ENABLED": "true",
+		"INQUIRY_FROM_EMAIL": "anfragen@hawo-abdulle.com"
 	}
 }

@@ -191,3 +191,10 @@ dd + dt { margin-top: .6rem; }
 .inquiry-form .button { justify-self: start; margin-top: .5rem; }
 .inquiry-form .button:disabled { opacity: .55; cursor: not-allowed; }
 .form-status { min-height: 1.5em; }
+.legal-main { padding-block: clamp(42px, 7vw, 88px); }
+.legal-main h1 { font-size: clamp(3rem, 7vw, 6rem); margin: .25em 0; }
+.legal-main h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1.15; margin: 1.4em 0 .45em; }
+.legal-main p, .legal-main li { max-width: 68rem; color: var(--body); }
+.legal-main p + p, .legal-main li + li { margin-top: .65rem; }
+.legal-main ul { padding-left: 1.25rem; }
+.legal-updated { font-size: .86rem; }

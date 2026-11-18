@@ -35,6 +35,22 @@ test("public inquiry endpoint does not store data while disabled", async () => {
   assert.equal(inserted, false);
 });
 
+test("inquiry intake stays disabled until email delivery is configured", async () => {
+  const response = await worker.fetch(request("/api/config"), {
+    INQUIRIES_ENABLED: "true",
+    TURNSTILE_SITE_KEY: "site",
+    TURNSTILE_SECRET_KEY: "secret",
+    INQUIRY_FROM_EMAIL: "sender@example.com",
+    INQUIRY_RECIPIENTS: "one@example.com,two@example.com"
+  });
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    inquiriesEnabled: false,
+    turnstileSiteKey: "site"
+  });
+});
+
 test("admin endpoints reject requests without an Access JWT", async () => {
   const response = await worker.fetch(request("/api/admin/inquiries"), {
     CF_ACCESS_TEAM_DOMAIN: "team.cloudflareaccess.com",
@@ -89,9 +105,127 @@ test("enabled inquiry endpoint validates input before external verification or s
     INQUIRIES_ENABLED: "true",
     TURNSTILE_SITE_KEY: "site",
     TURNSTILE_SECRET_KEY: "secret",
+    INQUIRY_FROM_EMAIL: "sender@example.com",
+    INQUIRY_RECIPIENTS: "one@example.com,two@example.com",
+    INQUIRY_EMAIL: { send: async () => ({ messageId: "test-message" }) },
     DB: { prepare() { queried = true; } }
   });
 
   assert.equal(response.status, 400);
   assert.equal(queried, false);
+});
+
+test("valid inquiries notify both recipients and are stored", async () => {
+  const originalFetch = globalThis.fetch;
+  let notification;
+  let inserted;
+  globalThis.fetch = async url => {
+    if (String(url).endsWith("/siteverify")) {
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      });
+    }
+    return new Response(null, { status: 404 });
+  };
+
+  try {
+    const response = await worker.fetch(request("/api/inquiries", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: "Test Sender",
+        email: "sender@example.com",
+        topic: "film",
+        message: "Interested in the project",
+        privacy: true,
+        turnstileToken: "valid-token"
+      })
+    }), {
+      INQUIRIES_ENABLED: "true",
+      TURNSTILE_SITE_KEY: "site",
+      TURNSTILE_SECRET_KEY: "secret",
+      INQUIRY_FROM_EMAIL: "notifications@example.com",
+      INQUIRY_RECIPIENTS: "one@example.com,two@example.com",
+      INQUIRY_EMAIL: {
+        send: async message => {
+          notification = message;
+          return { messageId: "test-message" };
+        }
+      },
+      DB: {
+        prepare(sql) {
+          assert.match(sql, /INSERT INTO inquiries/);
+          return {
+            bind(...values) {
+              inserted = values;
+              return { run: async () => ({ meta: { last_row_id: 1 } }) };
+            }
+          };
+        }
+      }
+    });
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(notification.to, ["one@example.com", "two@example.com"]);
+    assert.equal(notification.replyTo, "sender@example.com");
+    assert.match(notification.text, /Interested in the project/);
+    assert.deepEqual(inserted, ["Test Sender", "sender@example.com", "film", "Interested in the project"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("failed inquiry email delivery does not store the inquiry", async () => {
+  const originalFetch = globalThis.fetch;
+  let inserted = false;
+  globalThis.fetch = async url => String(url).endsWith("/siteverify")
+    ? new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    })
+    : new Response(null, { status: 404 });
+
+  try {
+    const response = await worker.fetch(request("/api/inquiries", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: "Test Sender",
+        email: "sender@example.com",
+        topic: "film",
+        message: "Interested in the project",
+        privacy: true,
+        turnstileToken: "valid-token"
+      })
+    }), {
+      INQUIRIES_ENABLED: "true",
+      TURNSTILE_SITE_KEY: "site",
+      TURNSTILE_SECRET_KEY: "secret",
+      INQUIRY_FROM_EMAIL: "notifications@example.com",
+      INQUIRY_RECIPIENTS: "one@example.com,two@example.com",
+      INQUIRY_EMAIL: { send: async () => { throw new Error("delivery failed"); } },
+      DB: { prepare() { inserted = true; } }
+    });
+
+    assert.equal(response.status, 502);
+    assert.equal(inserted, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("scheduled retention deletes inquiries 180 days after closure", async () => {
+  let query;
+  await worker.scheduled({}, {
+    DB: {
+      prepare(sql) {
+        query = sql;
+        return { run: async () => ({ meta: { changes: 2 } }) };
+      }
+    }
+  });
+
+  assert.match(query, /status = 'closed'/);
+  assert.match(query, /closed_at <= datetime\('now', '-180 days'\)/);
 });

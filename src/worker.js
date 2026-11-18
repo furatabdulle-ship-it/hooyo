@@ -5,6 +5,7 @@ const inquiryStatuses = new Set(["new", "in_progress", "answered", "closed"]);
 const contentStatuses = new Set(["draft", "published"]);
 const contentKinds = new Set(["article", "video"]);
 const languages = new Set(["de", "en"]);
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -64,6 +65,24 @@ function text(value, maxLength, required = false) {
   const result = value.trim();
   if (result.length > maxLength || (required && result.length === 0)) return null;
   return result;
+}
+
+function inquiryRecipients(env) {
+  if (typeof env.INQUIRY_RECIPIENTS !== "string") return null;
+  const recipients = env.INQUIRY_RECIPIENTS.split(",").map(value => value.trim()).filter(Boolean);
+  if (recipients.length !== 2 || new Set(recipients).size !== 2 ||
+      recipients.some(address => !emailPattern.test(address))) {
+    return null;
+  }
+  return recipients;
+}
+
+function inquiriesReady(env) {
+  return env.INQUIRIES_ENABLED === "true" &&
+    Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY) &&
+    typeof env.INQUIRY_EMAIL?.send === "function" &&
+    Boolean(env.INQUIRY_FROM_EMAIL && emailPattern.test(env.INQUIRY_FROM_EMAIL)) &&
+    Boolean(inquiryRecipients(env));
 }
 
 function validVideoUrl(value) {
@@ -198,7 +217,7 @@ function contentInput(body) {
 }
 
 async function handleInquiry(request, env) {
-  if (env.INQUIRIES_ENABLED !== "true") {
+  if (!inquiriesReady(env)) {
     return inputError("Das Anfrageformular ist noch nicht aktiviert.", 503);
   }
   const data = await readJson(request);
@@ -209,13 +228,43 @@ async function handleInquiry(request, env) {
   const email = text(data.email, 254, true);
   const topic = inquiryTopics.has(data.topic) ? data.topic : null;
   const message = text(data.message, 5000, true);
-  if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !topic || !message) {
+  if (!name || !email || !emailPattern.test(email) || !topic || !message) {
     return inputError("Bitte prüfe deine Angaben.");
   }
   if (data.privacy !== true) return inputError("Bitte bestätige den Datenschutzhinweis.");
 
   const verification = await verifyTurnstile(data.turnstileToken, request, env);
   if (!verification.ok) return inputError(verification.error, 400);
+
+  const topicLabels = {
+    beratung: "Beratung",
+    austausch: "Austausch",
+    veranstaltung: "Veranstaltung",
+    film: "Filmprojekt",
+    datenschutz: "Datenschutz",
+    sonstiges: "Sonstiges"
+  };
+  try {
+    await env.INQUIRY_EMAIL.send({
+      from: env.INQUIRY_FROM_EMAIL,
+      to: inquiryRecipients(env),
+      replyTo: email,
+      subject: "Neue Anfrage über hawo-abdulle.com",
+      text: [
+        "Neue Anfrage über hawo-abdulle.com",
+        "",
+        `Name: ${name}`,
+        `E-Mail: ${email}`,
+        `Thema: ${topicLabels[topic]}`,
+        "",
+        "Nachricht:",
+        message
+      ].join("\n")
+    });
+  } catch (error) {
+    console.error("Inquiry notification failed:", error?.code || error?.message || "unknown error");
+    return inputError("Die Anfrage konnte nicht zugestellt werden. Bitte versuche es später erneut.", 502);
+  }
 
   await env.DB.prepare(
     "INSERT INTO inquiries (name, email, topic, message) VALUES (?, ?, ?, ?)"
@@ -244,8 +293,9 @@ async function handleAdmin(request, env, pathname) {
   if (inquiryMatch && request.method === "PATCH") {
     const data = await readJson(request);
     if (!data || !inquiryStatuses.has(data.status)) return inputError("Ungültiger Anfrage-Status.");
-    const result = await env.DB.prepare("UPDATE inquiries SET status = ? WHERE id = ?")
-      .bind(data.status, Number(inquiryMatch[1])).run();
+    const result = await env.DB.prepare(
+      "UPDATE inquiries SET status = ?, closed_at = CASE WHEN ? = 'closed' THEN COALESCE(closed_at, CURRENT_TIMESTAMP) ELSE NULL END WHERE id = ?"
+    ).bind(data.status, data.status, Number(inquiryMatch[1])).run();
     if (!result.meta.changes) return inputError("Anfrage nicht gefunden.", 404);
     return json({ ok: true });
   }
@@ -287,13 +337,19 @@ async function handleAdmin(request, env, pathname) {
 }
 
 export default {
+  async scheduled(controller, env) {
+    const result = await env.DB.prepare(
+      "DELETE FROM inquiries WHERE status = 'closed' AND closed_at IS NOT NULL AND closed_at <= datetime('now', '-180 days')"
+    ).run();
+    console.info(`Deleted ${result.meta.changes} expired inquiries.`);
+  },
+
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
     try {
       if (pathname === "/api/config" && request.method === "GET") {
         return json({
-          inquiriesEnabled: env.INQUIRIES_ENABLED === "true" &&
-            Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY),
+          inquiriesEnabled: inquiriesReady(env),
           turnstileSiteKey: env.TURNSTILE_SITE_KEY ?? ""
         });
       }

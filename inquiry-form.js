@@ -39,8 +39,8 @@ if (inquiryForm) {
     .then(async config => {
       if (!config.inquiriesEnabled || !config.turnstileSiteKey) {
         statusMessage.textContent = message(
-          "Das Formular ist noch nicht freigeschaltet. Bitte schreibe alternativ eine E-Mail.",
-          "The form is not enabled yet. Please use the email link instead."
+          "Das Anfrageformular ist gerade nicht verfügbar. Bitte versuche es später erneut.",
+          "The enquiry form is currently unavailable. Please try again later."
         );
         return;
       }
@@ -70,8 +70,8 @@ if (inquiryForm) {
     })
     .catch(() => {
       statusMessage.textContent = message(
-        "Das Formular ist gerade nicht verfügbar. Bitte schreibe alternativ eine E-Mail.",
-        "The form is currently unavailable. Please use the email link instead."
+        "Das Anfrageformular ist gerade nicht verfügbar. Bitte versuche es später erneut.",
+        "The enquiry form is currently unavailable. Please try again later."
       );
     });
 
