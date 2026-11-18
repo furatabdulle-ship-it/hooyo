@@ -198,3 +198,28 @@ dd + dt { margin-top: .6rem; }
 .legal-main p + p, .legal-main li + li { margin-top: .65rem; }
 .legal-main ul { padding-left: 1.25rem; }
 .legal-updated { font-size: .86rem; }
+.about-hero .hero-intro { max-width: 42rem; }
+.about-tagline { max-width: 42rem; margin-bottom: 1rem; color: var(--violet); font: italic clamp(1.35rem, 2.4vw, 2rem)/1.2 var(--serif); }
+.about-overview { padding-block: clamp(42px, 6vw, 78px); background: #f0e8f1; }
+.about-overview p { max-width: 70rem; color: var(--body); font-size: clamp(1rem, 1.4vw, 1.16rem); }
+.about-overview p + p { margin-top: 1rem; }
+.about-sections { padding-block: clamp(28px, 5vw, 58px); }
+.about-section { display: grid; grid-template-columns: minmax(15rem, .68fr) 1.32fr; gap: 2rem clamp(2rem, 6vw, 5rem); padding-block: clamp(36px, 6vw, 72px); border-bottom: 1px solid var(--rule); }
+.about-section h2 { margin: 0; font-size: clamp(2.2rem, 4vw, 4rem); line-height: 1.02; }
+.about-section p, .about-section li { max-width: 54rem; color: var(--body); }
+.about-section p + p, .about-section ul { margin-top: .85rem; }
+.about-section ul { padding-left: 1.25rem; }
+.about-section h3 { margin: 1.5rem 0 .45rem; font-size: clamp(1.4rem, 2.1vw, 1.9rem); }
+.about-takeaway { margin-top: 1.5rem; padding: 1.2rem 1.35rem; border-left: 3px solid var(--violet); background: #f0e8f1; }
+.about-takeaway h3 { margin: 0 0 .45rem; }
+.about-services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.4rem; }
+.about-service { padding: 1.25rem; background: #fffaf4; border: 1px solid var(--rule); }
+.about-service h3 { margin: 0 0 .45rem; font-size: 1.35rem; }
+.about-cta { padding-block: clamp(48px, 7vw, 88px); background: var(--dark); color: var(--paper); }
+.about-cta h2 { max-width: 52rem; margin: .25em 0 .5em; font-size: clamp(2.6rem, 5vw, 5rem); }
+.about-cta p { max-width: 48rem; color: #e9dfea; }
+.about-cta .button { background: var(--paper); color: var(--dark); }
+@media (max-width: 680px) {
+  .about-section, .about-services { grid-template-columns: 1fr; }
+  .about-section { gap: 1.1rem; }
+}
