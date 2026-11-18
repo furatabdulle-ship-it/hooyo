@@ -203,8 +203,10 @@ dd + dt { margin-top: .6rem; }
 .about-local-nav { position: sticky; top: 0; z-index: 4; border-block: 1px solid var(--rule); background: rgb(248 245 238 / 96%); box-shadow: 0 8px 22px rgb(37 27 44 / 7%); backdrop-filter: blur(12px); }
 .about-local-nav-inner { display: flex; align-items: center; gap: .65rem 1.5rem; padding-block: .7rem; }
 .about-local-nav-label { flex: none; margin: 0; white-space: nowrap; }
-.about-local-nav ul { display: flex; flex-wrap: wrap; gap: .25rem .4rem; margin: 0; padding: 0; list-style: none; }
-.about-local-nav a { display: inline-flex; min-height: 36px; align-items: center; padding: .35rem .65rem; border: 1px solid transparent; color: var(--body); font-size: .88rem; font-weight: 650; text-decoration: none; }
+.about-local-nav ul { display: flex; flex: 1; min-width: 0; flex-wrap: nowrap; gap: .12rem; margin: 0; padding: 0; overflow-x: auto; list-style: none; scrollbar-width: none; }
+.about-local-nav ul::-webkit-scrollbar { display: none; }
+.about-local-nav li { flex: none; }
+.about-local-nav a { display: inline-flex; min-height: 36px; align-items: center; padding: .3rem .42rem; border: 1px solid transparent; color: var(--body); font-size: .8rem; font-weight: 650; text-decoration: none; white-space: nowrap; }
 .about-local-nav a:hover, .about-local-nav a:focus-visible { border-color: var(--rule); background: #fffaf4; color: var(--violet); }
 .about-overview { padding-block: clamp(42px, 6vw, 78px); background: #f0e8f1; scroll-margin-top: 112px; }
 .about-overview p { max-width: 70rem; color: var(--body); font-size: clamp(1.08rem, 1.55vw, 1.25rem); line-height: 1.75; }
@@ -231,7 +233,13 @@ dd + dt { margin-top: .6rem; }
 @media (max-width: 680px) {
   .about-section, .about-services { grid-template-columns: 1fr; }
   .about-section { gap: 1.1rem; }
-  .about-local-nav-inner { align-items: flex-start; flex-direction: column; gap: .25rem; }
-  .about-local-nav ul { gap: .15rem; }
-  .about-local-nav a { min-height: 32px; padding-inline: .5rem; font-size: .82rem; }
+  .about-local-nav-inner { align-items: flex-start; flex-direction: column; gap: .2rem; }
+  .about-local-nav-label { font-size: .62rem; }
+  .about-local-nav ul { width: 100%; }
+  .about-local-nav a { min-height: 32px; padding-inline: .3rem; font-size: .72rem; }
+}
+@media (min-width: 681px) and (max-width: 900px) {
+  .about-local-nav-inner { align-items: flex-start; flex-direction: column; gap: .2rem; }
+  .about-local-nav ul { width: 100%; }
+  .about-local-nav a { min-height: 32px; padding-inline: .3rem; font-size: .74rem; }
 }
