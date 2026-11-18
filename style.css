@@ -70,6 +70,9 @@ h3 { font-size: clamp(1.9rem, 3.2vw, 3rem); line-height: 1.1; letter-spacing: -.
 .film-grid { display: grid; grid-template-columns: 1.13fr .87fr; gap: clamp(2.2rem, 7vw, 6.6rem); align-items: center; }
 .film-visual { width: 100%; max-width: 20rem; justify-self: center; aspect-ratio: auto; background: #4d3559; }
 .film-visual > img { display: block; width: 100%; height: auto; }
+.film-award { position: relative; width: min(100%, 56rem); margin: clamp(2.5rem, 5vw, 4rem) auto 0; overflow: hidden; }
+.film-award img { display: block; width: 100%; height: auto; }
+.film-award figcaption { color: #f7edf4; background: #302438; }
 .film-art { background: linear-gradient(148deg, #553b67, #201625 82%); }
 .film-art::before { content: ''; position: absolute; inset: 11% 13% 21%; border-radius: 37px; background: linear-gradient(180deg,#745b93 0%,#bc8196 48%,#efb294 65%,#67425f 65.5%,#332337 100%); border: clamp(7px, 1.4vw, 18px) solid #23192b; box-shadow: 0 0 0 1px #b393c176, inset 0 0 35px #42354c85, 0 16px 48px #190c2277; }
 .film-art i { position: absolute; top: 33%; left: 44%; width: 14%; aspect-ratio: 1; background: #ffd1a9; border-radius: 50%; box-shadow: 0 0 32px #ffbf9a85; }
