@@ -115,6 +115,46 @@ test("enabled inquiry endpoint validates input before external verification or s
   assert.equal(queried, false);
 });
 
+test("inquiry endpoint rejects removed topics before Turnstile verification", async () => {
+  const originalFetch = globalThis.fetch;
+  let verified = false;
+  globalThis.fetch = async () => {
+    verified = true;
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  };
+
+  try {
+    for (const topic of ["austausch", "datenschutz"]) {
+      const response = await worker.fetch(request("/api/inquiries", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: "Test Sender",
+          email: "sender@example.com",
+          topic,
+          message: "Hello",
+          privacy: true,
+          turnstileToken: "valid-token"
+        })
+      }), {
+        INQUIRIES_ENABLED: "true",
+        TURNSTILE_SITE_KEY: "site",
+        TURNSTILE_SECRET_KEY: "secret",
+        INQUIRY_FROM_EMAIL: "sender@example.com",
+        INQUIRY_RECIPIENTS: "one@example.com,two@example.com",
+        INQUIRY_EMAIL: { send: async () => ({ messageId: "test-message" }) },
+        DB: { prepare() { throw new Error("Invalid topic must not be stored"); } }
+      });
+
+      assert.equal(response.status, 400);
+    }
+
+    assert.equal(verified, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("valid inquiries notify both recipients and are stored", async () => {
   const originalFetch = globalThis.fetch;
   let notification;

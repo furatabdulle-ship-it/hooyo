@@ -1,6 +1,6 @@
 let cachedJwks;
 
-const inquiryTopics = new Set(["beratung", "austausch", "veranstaltung", "film", "sonstiges"]);
+const inquiryTopics = new Set(["beratung", "veranstaltung", "film", "sonstiges"]);
 const inquiryStatuses = new Set(["new", "in_progress", "answered", "closed"]);
 const contentStatuses = new Set(["draft", "published"]);
 const contentKinds = new Set(["article", "video"]);
@@ -238,10 +238,8 @@ async function handleInquiry(request, env) {
 
   const topicLabels = {
     beratung: "Beratung",
-    austausch: "Austausch",
     veranstaltung: "Veranstaltung",
     film: "Filmprojekt",
-    datenschutz: "Datenschutz",
     sonstiges: "Sonstiges"
   };
   try {
