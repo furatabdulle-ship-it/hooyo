@@ -63,7 +63,7 @@ Das CMS läuft als Cloudflare Worker mit statischen Website-Dateien und einer D1
    npm run deploy
    ```
 
-   Die Konfiguration bindet nur `www.hawo-abdulle.com/api/*` an den Worker. Die übrige Website bleibt bei GitHub Pages; `workers.dev` ist deaktiviert.
+   Die Konfiguration bindet nur `www.hawo-abdulle.com/api/*` an den Worker. Die übrige Website bleibt bei GitHub Pages und wird nur aus dem Ordner `docs/` veröffentlicht (Settings → Pages → Branch `main`, Ordner `/docs`), damit Konfigurations- und Quelldateien nicht öffentlich erreichbar sind; `workers.dev` ist deaktiviert.
 
 11. Die CMS-Oberfläche unter `/cms/` und die geänderten Website-Dateien über den bestehenden GitHub-Pages-Workflow veröffentlichen. Die Access-Anwendungen schützen `/cms/*` und `/api/admin/*`; vor dem Livegang beide Pfade mit einem berechtigten und einem nicht berechtigten Konto prüfen.
 
